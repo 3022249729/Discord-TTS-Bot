@@ -1,5 +1,5 @@
-# Discord TTS Bot
-A discord bot writen in Python that plays Text-To-Speech(TTS) audio in a voice channel.
+# RenoTTS
+A discord bot writen in Python that plays Text-To-Speech/TTS audio in a voice channel.
 
 ## Installation
 ### Step 1: Install Python
