@@ -74,4 +74,4 @@ sudo make install
 ```bash
 python main.py
 ```
-To get help of the bot commands, send ``!help`` in the Discord server.
+To get help of the bot commands, send ``,help`` in the Discord server.

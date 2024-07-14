@@ -112,7 +112,7 @@ class TTS(commands.Cog):
         with open('serverSettings.json', 'r') as f:
             settings = json.load(f)
 
-        s = {"prefix": "!", "language": None, "channel": None}
+        s = {"prefix": ",", "language": None, "channel": None}
         
         settings[str(guild.id)] = s
         with open('serverSettings.json', 'w') as f:
