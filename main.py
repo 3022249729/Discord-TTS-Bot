@@ -60,7 +60,7 @@ client.help_command = Help()
 
 @client.event
 async def on_ready():
-    path = ctypes.util.find_library('libopus')
+    path = ctypes.util.find_library('opus')
     if path is None:
         raise Exception("Opus not detected, please refer to README and install Opus before running the bot.")
     discord.opus.load_opus(path)
