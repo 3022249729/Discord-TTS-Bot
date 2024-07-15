@@ -4,6 +4,7 @@ from discord.ext import commands
 import TTS
 import asyncio
 import ctypes
+import os
 
 token = 'YOUR_TOKEN_HERE'
 
@@ -60,6 +61,9 @@ client.help_command = Help()
 
 @client.event
 async def on_ready():
+    if not os.path.exists("mp3files"):
+        os.makedirs("mp3files")
+        
     path = ctypes.util.find_library('opus')
     if path is None:
         raise Exception("Opus not detected, please refer to README and install Opus before running the bot.")

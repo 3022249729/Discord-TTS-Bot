@@ -54,16 +54,18 @@ class TTS(commands.Cog):
 
     async def playTTS(self, ctx):
         while self.queue:
-            ctx.voice_client.play(discord.FFmpegPCMAudio(f'./mp3files/{self.queue[0]}'), after=lambda e: self.client.loop.create_task(self.removePlayNext(ctx)))
+            file = self.queue[0]
+            ctx.voice_client.play(discord.FFmpegPCMAudio(f'./mp3files/{file}'), after=lambda e: self.client.loop.create_task(self.removeFile(file)))
             self.lastAuthorTime = time.time()
             while ctx.voice_client.is_playing():
                 await asyncio.sleep(1)
 
-    async def removePlayNext(self, ctx):
-        os.remove(f'./mp3files/{self.queue[0]}')
-        self.queue.pop(0)
-        if self.queue:
-            await self.playTTS(ctx)
+    async def removeFile(self, file):
+        try:
+            os.remove(f'./mp3files/{file}')
+            self.queue.remove(file)
+        except:
+            pass
 
     @commands.command(name='setLanguage', aliases=['lang', 'sl'], description="Sets the language for TTS. \nSupported languages:\n`en`: English\n `fr`: French\n `zh-CN`: Chinese\n `pt`: Portuguese\n `es`: Spanish")
     async def _setLanguage(self, ctx, lang):
@@ -140,18 +142,11 @@ class TTS(commands.Cog):
                 await ctx.send("I'm already in a voice channel")
                 return
 
-            regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-            url = re.findall(regex, message.content)
-            if url:
-                return
-            # blocks url
-            
-            content = re.sub(r'<a?:\w+:\d+>', '', message.content)
+            content = self.replaceInvalidContents(ctx, message.content)
             if content == "":
                 return
-            # blocks emoji
-            
-            if time.time() - self.lastAuthorTime > 60 or self.lastAuthor is not ctx.author.display_name:
+
+            if time.time() - self.lastAuthorTime > 60 or not self.lastAuthor == ctx.author.display_name:
                 content = ctx.author.display_name + transitionWord[serverSetting["language"]] + "," + content
 
             self.lastAuthor = ctx.author.display_name
@@ -162,6 +157,30 @@ class TTS(commands.Cog):
             
             if not ctx.voice_client.is_playing():
                 await self.playTTS(ctx)
+
+    def replaceInvalidContents(self, ctx, content):
+        content = re.sub(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))", '', content)
+        #deletes all urls
+
+        content = re.sub(r'<a?:\w+:\d+>', '', content)
+        if content == "":
+            return
+        #deletes all emojies
+
+        guild = ctx.guild
+        mentions = re.findall(r'<@!?(\d+)>', content)
+        if mentions:
+            for mention in mentions:
+                content = content.replace(f'<@{mention}>', guild.get_member(int(mention)).display_name + ',')
+        #replace all user mentions to name of the user
+
+        channels = re.findall(r'<#!?(\d+)>', content)
+        if channels:
+            for channel in channels:
+                content = content.replace(f'<#{channel}>', guild.get_channel(int(channel)).name + ',')
+
+        return content
+        #replace all server mentions to name of the server
 
 async def setup(client):
     await client.add_cog(TTS(client))
