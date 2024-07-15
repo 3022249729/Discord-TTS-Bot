@@ -76,5 +76,5 @@ python main.py
 ```
 To get help of the bot commands, send ``,help`` in the Discord server.
 
-## Important
+### Important
 **Host the bot first before inviting the bot into servers!**
