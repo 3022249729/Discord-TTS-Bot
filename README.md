@@ -1,8 +1,9 @@
 # RenoTTS
 A Discord bot writen in Python that plays Text-To-Speech/TTS audio in a voice channel.
 
-## Important Notice
-Host the bot first before inviting the bot into servers!
+## Important
+**Host the bot first before inviting the bot into servers!**
+
 
 ## Installation
 ### Step 1: Install Python
