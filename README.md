@@ -1,5 +1,5 @@
 # RenoTTS
-A Discord bot writen in Python that plays Text-To-Speech/TTS audio in a voice channel. Supports per-server settings like custom prefix as well as the language for TTS files.
+A Discord bot writen in Python that plays Text-To-Speech/TTS audio in a voice channel. Supports per-server settings like custom prefix as well as the language for TTS files. Supported languages: Chinese Mandarin, English, French, Portuguese, Spanish.
 
 ## Installation
 ### Step 1: Install Python

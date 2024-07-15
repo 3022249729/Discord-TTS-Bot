@@ -130,6 +130,10 @@ class TTS(commands.Cog):
         
         if message.channel.id == serverSetting["channel"] and not message.author.bot and not message.content.startswith(serverSetting["prefix"]):
             ctx = await self.client.get_context(message)
+            content = self.replaceInvalidContents(ctx, message.content)
+            if content == "" or content == None:
+                return
+
             if ctx.author.voice is None:
                 await ctx.send("Please join a voice channel first")        
                 return
@@ -141,11 +145,7 @@ class TTS(commands.Cog):
             elif ctx.voice_client.channel is not ctx.author.voice.channel:
                 await ctx.send("I'm already in a voice channel")
                 return
-
-            content = self.replaceInvalidContents(ctx, message.content)
-            if content == "":
-                return
-
+            
             if time.time() - self.lastAuthorTime > 60 or not self.lastAuthor == ctx.author.display_name:
                 content = ctx.author.display_name + transitionWord[serverSetting["language"]] + "," + content
 
