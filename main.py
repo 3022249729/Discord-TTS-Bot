@@ -14,7 +14,7 @@ cogs = [TTS]
 def get_prefix(client, message):
     with open('serverSettings.json', 'r') as f:
         settings = json.load(f)
-    return settings[str(message.guild.id)]["prefix"]
+    return settings[str(message.guild.id)]['prefix']
 
 
 client = commands.Bot(command_prefix=(get_prefix), case_insensitive=True, intents = discord.Intents.all())

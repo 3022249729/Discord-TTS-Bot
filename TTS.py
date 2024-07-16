@@ -92,14 +92,14 @@ class TTS(commands.Cog):
     @commands.command(name='language', aliases=['lang', 'sl'], description="Set the language for TTS messages.\n\nCommon languages:\n`en` - English\n`zh-CN` - Chinese (Simplified)\n`hi` - Hindi\n`es` - Spanish\n`fr` - French\n`ar` - Arabic\n`bn` - Bengali\n`ru` - Russian\n`pt` - Portuguese\n`ja` - Japanese\n`ur` - Urdu\n`ko` - Korean\n`de` - German\n`id` - Indonesian\n\nFor more supported languages, please refer to [github](https://github.com/3022249729/RenoTTS?tab=readme-ov-file#running-the-bot). ")
     async def _language(self, ctx, lang):
         if lang not in languages.keys():
-            await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]["prefix"]}lang` for a list of supported languages.")
+            await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]['prefix']}lang` for a list of supported languages.")
             return
         with open('serverSettings.json', 'r') as f:
             settings = json.load(f)
-        settings[str(ctx.guild.id)]["language"] = lang
+        settings[str(ctx.guild.id)]['language'] = lang
         with open('serverSettings.json', 'w') as f:
             json.dump(settings, f, indent=4)
-        await ctx.send(f"Language set to {languages[str(lang)]["name"]}")
+        await ctx.send(f"Language set to {languages[str(lang)]['name']}")
         self.readSettings()
 
     @commands.command(name='channel', aliases=['sc'], description="Set the channel to monitor for TTS messages. Use this command in the targeted text chanel, all messages sent in this channel will convert to TTS messages.")
@@ -107,7 +107,7 @@ class TTS(commands.Cog):
         with open('serverSettings.json', 'r') as f:
             settings = json.load(f)
         channel = ctx.message.channel
-        settings[str(ctx.guild.id)]["channel"] = channel.id
+        settings[str(ctx.guild.id)]['channel'] = channel.id
         with open('serverSettings.json', 'w') as f:
             json.dump(settings, f, indent=4)
         await ctx.send(f"TTS channel set to <#{channel.id}>")
@@ -117,7 +117,7 @@ class TTS(commands.Cog):
     async def _prefix(self, ctx, prefix):
         with open('serverSettings.json', 'r') as f:
             settings = json.load(f)
-        settings[str(ctx.guild.id)]["prefix"] = prefix
+        settings[str(ctx.guild.id)]['prefix'] = prefix
         with open('serverSettings.json', 'w') as f:
             json.dump(settings, f, indent=4)
         await ctx.send(f"Prefix changed to {prefix}")
@@ -131,8 +131,8 @@ class TTS(commands.Cog):
             await ctx.channel.send("Server not registered, please re-invite the bot to the server while the bot is hosted.")
             return
         
-        if serverSetting["language"] is None:
-            await ctx.send(f"The language for TTS messages is not set, use `{serverSetting["prefix"]}help lang` to get started.")
+        if serverSetting['language'] is None:
+            await ctx.send(f"The language for TTS messages is not set, use `{serverSetting['prefix']}help lang` to get started.")
             return
         
         content = self.replaceInvalidContents(ctx, content)
@@ -185,9 +185,9 @@ class TTS(commands.Cog):
                 await message.channel.send("Server not registered, please re-invite the bot to the server while the bot is hosted.")
                 return
             
-            if message.channel.id == serverSetting["channel"] and not message.content.startswith(serverSetting["prefix"]):
+            if message.channel.id == serverSetting['channel'] and not message.content.startswith(serverSetting['prefix']):
                 if serverSetting['language'] is None:
-                    await message.channel.send(f"The language for TTS messages is not set, use `{serverSetting["prefix"]}help lang` to get started")
+                    await message.channel.send(f"The language for TTS messages is not set, use `{serverSetting['prefix']}help lang` to get started")
                     return
                 
                 ctx = await self.client.get_context(message)
@@ -232,11 +232,11 @@ class TTS(commands.Cog):
         
     def addTTS(self, ctx, content, serverSetting):
         if time.time() - self.lastAuthorTime > 60 or not self.lastAuthor == ctx.author.display_name:
-            content = ctx.author.display_name + languages[serverSetting["language"]]["transitionWord"] + "," + content
+            content = ctx.author.display_name + languages[serverSetting['language']]['transitionWord'] + "," + content
 
         self.lastAuthor = ctx.author.display_name
         try:
-            tts = gTTS(text=content, lang=serverSetting["language"])
+            tts = gTTS(text=content, lang=serverSetting['language'])
         except ValueError:
             ctx.send("Language currently not supported.")
             return
