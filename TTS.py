@@ -14,6 +14,7 @@ class TTS(commands.Cog):
     def reset(self):
         self.lastAuthor = None
         self.lastAuthorTime = 0
+        self.ignoreTTS = False
         self.readSettings()
         self.deleteQueue()
         
@@ -34,6 +35,7 @@ class TTS(commands.Cog):
         self.queue = []
         self.lastAuthor = None
         self.lastAuthorTime = 0
+        self.ignoreTTS = False
         self.readSettings()
 
     async def autoLeave(self, ctx):
@@ -70,7 +72,6 @@ class TTS(commands.Cog):
                 
     async def removeFile(self, file):
         try:
-            print(file)
             os.remove(f'./mp3files/{file}')
             self.queue.remove(file)
         except:
@@ -94,32 +95,35 @@ class TTS(commands.Cog):
         if lang not in languages.keys():
             await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]['prefix']}lang` for a list of supported languages.")
             return
-        with open('serverSettings.json', 'r') as f:
-            settings = json.load(f)
-        settings[str(ctx.guild.id)]['language'] = lang
+        self.settings[str(ctx.guild.id)]['language'] = lang
         with open('serverSettings.json', 'w') as f:
-            json.dump(settings, f, indent=4)
+            json.dump(self.settings, f, indent=4)
         await ctx.send(f"Language set to {languages[str(lang)]['name']}")
         self.readSettings()
 
-    @commands.command(name='channel', aliases=['sc'], description="Set the channel to monitor for TTS messages. Use this command in the targeted text chanel, all messages sent in this channel will convert to TTS messages.")
+    @commands.command(name='setChannel', aliases=['sc'], description="Set the channel to monitor for TTS messages. Use this command in the targeted text chanel, all messages sent in this channel will convert to TTS messages.")
     async def _channel(self, ctx):
-        with open('serverSettings.json', 'r') as f:
-            settings = json.load(f)
         channel = ctx.message.channel
-        settings[str(ctx.guild.id)]['channel'] = channel.id
+        self.settings[str(ctx.guild.id)]['channel'] = channel.id
         with open('serverSettings.json', 'w') as f:
-            json.dump(settings, f, indent=4)
+            json.dump(self.settings, f, indent=4)
         await ctx.send(f"TTS channel set to <#{channel.id}>")
+        self.readSettings()
+
+    @commands.command(name='unsetChannel', aliases=['uc'], description="Stop monitoring messages in the configured TTS message channel.")
+    async def _unsetChannel(self, ctx):
+        self.settings[str(ctx.guild.id)]['channel'] = None
+        with open('serverSettings.json', 'w') as f:
+            json.dump(self.settings, f, indent=4)
+        await ctx.send(f"TTS channel cleared.")
         self.readSettings()
 
     @commands.command(name='setPrefix', aliases=['sp'], description="Change custom bot prefix.")
     async def _prefix(self, ctx, prefix):
-        with open('serverSettings.json', 'r') as f:
-            settings = json.load(f)
-        settings[str(ctx.guild.id)]['prefix'] = prefix
+        self.ignoreTTS = True
+        self.settings[str(ctx.guild.id)]['prefix'] = prefix
         with open('serverSettings.json', 'w') as f:
-            json.dump(settings, f, indent=4)
+            json.dump(self.settings, f, indent=4)
         await ctx.send(f"Prefix changed to {prefix}")
         self.readSettings()
 
@@ -128,7 +132,7 @@ class TTS(commands.Cog):
         try:
             serverSetting = self.settings[str(ctx.guild.id)]
         except KeyError:
-            await ctx.channel.send("Server not registered, please re-invite the bot to the server while the bot is hosted.")
+            await ctx.channel.send("Server not configured, please re-invite the bot to the server while the bot is hosted.")
             return
         
         if serverSetting['language'] is None:
@@ -154,6 +158,22 @@ class TTS(commands.Cog):
         if ctx.voice_client:
             ctx.voice_client.stop()
             await ctx.voice_client.disconnect()
+
+    @commands.command(name='settings', description="Get the TTS settings for the server.")
+    async def _settings(self, ctx):
+        embed = discord.Embed(title="Settings")
+        embed.add_field(name = 'Prefix:', value=f"`{self.settings[str(ctx.guild.id)]['prefix']}`", inline = True)
+        embed.add_field(name = 'TTS Language:', value=f"`{self.settings[str(ctx.guild.id)]['language']}`", inline = True)
+        embed.add_field(name = 'TTS Channel:', value=self.settingsChannelHelper(ctx.guild.id),inline=True)
+        embed.set_footer(text='TTS Bot by ren.xxx', icon_url = ctx.bot.user.avatar.url)
+        await ctx.send(embed=embed)
+
+    def settingsChannelHelper(self, guild):
+        if self.settings[str(guild)]['channel'] == None:
+            return "None"
+        else:
+            return f"<#{self.settings[str(guild)]['channel']}>"
+
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
@@ -182,12 +202,15 @@ class TTS(commands.Cog):
             try:
                 serverSetting = self.settings[str(message.guild.id)]
             except KeyError:
-                await message.channel.send("Server not registered, please re-invite the bot to the server while the bot is hosted.")
+                await message.channel.send("Server not configured, please re-invite the bot to the server while the bot is hosted.")
                 return
             
             if message.channel.id == serverSetting['channel'] and not message.content.startswith(serverSetting['prefix']):
                 if serverSetting['language'] is None:
                     await message.channel.send(f"The language for TTS messages is not set, use `{serverSetting['prefix']}help lang` to get started")
+                    return
+                if self.ignoreTTS:
+                    self.ignoreTTS = False
                     return
                 
                 ctx = await self.client.get_context(message)
@@ -244,6 +267,6 @@ class TTS(commands.Cog):
         ttsFileName = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16)) + '.mp3'
         tts.save(f"./mp3files/{ttsFileName}")
         self.queue.append(ttsFileName)
-        
+
 async def setup(client):
     await client.add_cog(TTS(client))

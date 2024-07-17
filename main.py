@@ -29,9 +29,9 @@ class Help(commands.HelpCommand):
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
 
     async def send_bot_help(self, mapping):
-        embed = discord.Embed(title="Help", color=0x47A7FF)
+        embed = discord.Embed(title="Help")
         prefix = self.context.clean_prefix
-        embed.description = f"Do `{prefix}help <command>` for more help of the command.\nType `{prefix}help lang` for the list of supported languages.\n\nCapitalization of the commands are ignored.\n`[argument]` are optional, `<argument>` are required.\n "
+        embed.description = f"Do `{prefix}help <command>` for more help of the command.\n`[argument]` is optional, `<argument>` is required.\n "
         for cog, commands in mapping.items():
             command_signatures = []
 
@@ -47,7 +47,7 @@ class Help(commands.HelpCommand):
         await channel.send(embed=embed)
 
     async def send_command_help(self, command):
-        embed = discord.Embed(title=self.get_command_signature(command) , color=0x47A7FF)
+        embed = discord.Embed(title=self.get_command_signature(command))
         if command.description:
             embed.description = command.description
         if alias := command.aliases:
