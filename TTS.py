@@ -145,13 +145,12 @@ class TTS(commands.Cog):
 
         if not ctx.voice_client:
             await self.joinVC(ctx)
-            
-        try:
-            self.addTTS(ctx, content, serverSetting)    
-            if not ctx.voice_client.is_playing():
-                await self.playTTS(ctx)
-        except AttributeError:
-            pass
+            if not ctx.voice_client:
+                return
+        
+        self.addTTS(ctx, content, serverSetting)    
+        if not ctx.voice_client.is_playing():
+            await self.playTTS(ctx)
 
     @commands.command(name='stop', aliases=['leave', 'dc'], description="Stops playing TTS and leave the voice channel.")
     async def _stop(self, ctx):
