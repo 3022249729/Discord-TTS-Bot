@@ -221,13 +221,13 @@ class TTS(commands.Cog):
 
                 if not ctx.voice_client:
                     await self.joinVC(ctx)
+                    if not ctx.voice_client:
+                        return
+                
+                self.addTTS(ctx, content, serverSetting)    
+                if not ctx.voice_client.is_playing():
+                    await self.playTTS(ctx)
 
-                try:
-                    self.addTTS(ctx, content, serverSetting)    
-                    if not ctx.voice_client.is_playing():
-                        await self.playTTS(ctx)
-                except AttributeError:
-                    pass
 
     def replaceInvalidContents(self, ctx, content):
         content = re.sub(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))", '', content)
