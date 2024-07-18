@@ -79,6 +79,7 @@ python main.py
 
 ### Commands
 The default command prefix for the bot is `.`.
+
 Below is the list of all the commands for the bot:
 | Command                       | Aliases          | Description                                                                                                                                                                         |
 |-------------------------------|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
