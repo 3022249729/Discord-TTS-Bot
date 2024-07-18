@@ -205,6 +205,8 @@ class TTS(commands.Cog):
                     self.ignoreTTS = False
                     return
                 
+                ctx = await self.client.get_context(message)
+                
                 if ctx.author.voice is None:
                     await ctx.send("Please join a voice channel first.")        
                     return
@@ -216,9 +218,7 @@ class TTS(commands.Cog):
                 elif ctx.voice_client.channel is not ctx.author.voice.channel:
                     await ctx.send("I'm already in a voice channel.")
                     return
-                
-                ctx = await self.client.get_context(message)
-
+            
                 content = self.replaceInvalidContents(ctx, message.content)
                 if content == "" or content == None:
                     return
