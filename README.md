@@ -80,8 +80,8 @@ python main.py
 ### Commands
 The default command prefix for the bot is `.`.
 Below is the list of all the commands for the bot:
-| Command                         | Alias             | Description                                                                           |
-|---------------------------------|-------------------|---------------------------------------------------------------------------------------|
+| Command                         | Alias             | Description                                                             |
+|---------------------------------|-------------------|-------------------------------------------------------------------------|
 | `.say \<content\>`              | `.s`              | Send a TTS message in your voice channel with the language you set.                                                                                  |
 | `.stop`                         | `.dc`, `.leave`   | Stop the bot and leave the channel.                                                                              |        
 | `.setChannel`                   | `.channel`, `.sc` | Set the channel where this command is sent as the TTS channel. The bot will start monitoring the TTS channel and send TTS messages in your voice channel for all the text messages.|
