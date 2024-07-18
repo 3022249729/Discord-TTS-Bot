@@ -75,20 +75,7 @@ class TTS(commands.Cog):
             os.remove(f'./mp3files/{file}')
             self.queue.remove(file)
         except:
-            pass
-
-    async def joinVC(self, ctx):
-        if ctx.author.voice is None:
-            await ctx.send("Please join a voice channel first.")        
-            return
-        elif ctx.voice_client is None:
-            voice_channel = ctx.author.voice.channel
-            await voice_channel.connect()
-            ctx.voice_client.stop()
-            self.client.loop.create_task(self.autoLeave(ctx))
-        elif ctx.voice_client.channel is not ctx.author.voice.channel:
-            await ctx.send("I'm already in a voice channel.")
-            return
+            pass     
         
     @commands.command(name='say', aliases=['s'], description="Send a TTS message in your voice channel.")
     async def _say(self, ctx, *, content):
@@ -102,14 +89,21 @@ class TTS(commands.Cog):
             await ctx.send(f"The language for TTS messages is not set, use `{serverSetting['prefix']}help lang` to get started.")
             return
         
+        if ctx.author.voice is None:
+            await ctx.send("Please join a voice channel first.")        
+            return
+        elif ctx.voice_client is None:
+            voice_channel = ctx.author.voice.channel
+            await voice_channel.connect()
+            ctx.voice_client.stop()
+            self.client.loop.create_task(self.autoLeave(ctx))
+        elif ctx.voice_client.channel is not ctx.author.voice.channel:
+            await ctx.send("I'm already in a voice channel.")
+            return
+        
         content = self.replaceInvalidContents(ctx, content)
         if content == "" or content == None:
             return
-
-        if not ctx.voice_client:
-            await self.joinVC(ctx)
-            if not ctx.voice_client:
-                return
         
         self.addTTS(ctx, content, serverSetting)    
         if not ctx.voice_client.is_playing():
@@ -211,16 +205,23 @@ class TTS(commands.Cog):
                     self.ignoreTTS = False
                     return
                 
+                if ctx.author.voice is None:
+                    await ctx.send("Please join a voice channel first.")        
+                    return
+                elif ctx.voice_client is None:
+                    voice_channel = ctx.author.voice.channel
+                    await voice_channel.connect()
+                    ctx.voice_client.stop()
+                    self.client.loop.create_task(self.autoLeave(ctx))
+                elif ctx.voice_client.channel is not ctx.author.voice.channel:
+                    await ctx.send("I'm already in a voice channel.")
+                    return
+                
                 ctx = await self.client.get_context(message)
 
                 content = self.replaceInvalidContents(ctx, message.content)
                 if content == "" or content == None:
                     return
-
-                if not ctx.voice_client:
-                    await self.joinVC(ctx)
-                    if not ctx.voice_client:
-                        return
                 
                 self.addTTS(ctx, content, serverSetting)    
                 if not ctx.voice_client.is_playing():
