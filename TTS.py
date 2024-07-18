@@ -89,44 +89,7 @@ class TTS(commands.Cog):
         elif ctx.voice_client.channel is not ctx.author.voice.channel:
             await ctx.send("I'm already in a voice channel.")
             return
-            
-    @commands.command(name='language', aliases=['lang', 'sl'], description="Set the language for TTS messages.\n\nCommon languages:\n`en` - English\n`zh-CN` - Chinese (Simplified)\n`hi` - Hindi\n`es` - Spanish\n`fr` - French\n`ar` - Arabic\n`bn` - Bengali\n`ru` - Russian\n`pt` - Portuguese\n`ja` - Japanese\n`ur` - Urdu\n`ko` - Korean\n`de` - German\n`id` - Indonesian\n\nFor more supported languages, please refer to [github](https://github.com/3022249729/RenoTTS?tab=readme-ov-file#running-the-bot). ")
-    async def _language(self, ctx, lang):
-        if lang not in languages.keys():
-            await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]['prefix']}lang` for a list of supported languages.")
-            return
-        self.settings[str(ctx.guild.id)]['language'] = lang
-        with open('serverSettings.json', 'w') as f:
-            json.dump(self.settings, f, indent=4)
-        await ctx.send(f"Language set to {languages[str(lang)]['name']}")
-        self.readSettings()
-
-    @commands.command(name='setChannel', aliases=['sc'], description="Set the channel to monitor for TTS messages. Use this command in the targeted text chanel, all messages sent in this channel will convert to TTS messages.")
-    async def _channel(self, ctx):
-        channel = ctx.message.channel
-        self.settings[str(ctx.guild.id)]['channel'] = channel.id
-        with open('serverSettings.json', 'w') as f:
-            json.dump(self.settings, f, indent=4)
-        await ctx.send(f"TTS channel set to <#{channel.id}>")
-        self.readSettings()
-
-    @commands.command(name='unsetChannel', aliases=['uc'], description="Stop monitoring messages in the configured TTS message channel.")
-    async def _unsetChannel(self, ctx):
-        self.settings[str(ctx.guild.id)]['channel'] = None
-        with open('serverSettings.json', 'w') as f:
-            json.dump(self.settings, f, indent=4)
-        await ctx.send(f"TTS channel cleared.")
-        self.readSettings()
-
-    @commands.command(name='setPrefix', aliases=['sp'], description="Change custom bot prefix.")
-    async def _prefix(self, ctx, prefix):
-        self.ignoreTTS = True
-        self.settings[str(ctx.guild.id)]['prefix'] = prefix
-        with open('serverSettings.json', 'w') as f:
-            json.dump(self.settings, f, indent=4)
-        await ctx.send(f"Prefix changed to {prefix}")
-        self.readSettings()
-
+        
     @commands.command(name='say', aliases=['s'], description="Send a TTS message in your voice channel.")
     async def _say(self, ctx, *, content):
         try:
@@ -158,6 +121,43 @@ class TTS(commands.Cog):
             ctx.voice_client.stop()
             await ctx.voice_client.disconnect()
 
+    @commands.command(name='setChannel', aliases=['sc'], description="Set the channel to monitor for TTS messages. Use this command in the targeted text chanel, all messages sent in this channel will convert to TTS messages.")
+    async def _channel(self, ctx):
+        channel = ctx.message.channel
+        self.settings[str(ctx.guild.id)]['channel'] = channel.id
+        with open('serverSettings.json', 'w') as f:
+            json.dump(self.settings, f, indent=4)
+        await ctx.send(f"TTS channel set to <#{channel.id}>")
+        self.readSettings()
+
+    @commands.command(name='unsetChannel', aliases=['uc'], description="Stop monitoring messages in the configured TTS message channel.")
+    async def _unsetChannel(self, ctx):
+        self.settings[str(ctx.guild.id)]['channel'] = None
+        with open('serverSettings.json', 'w') as f:
+            json.dump(self.settings, f, indent=4)
+        await ctx.send(f"TTS channel cleared.")
+        self.readSettings()
+
+    @commands.command(name='language', aliases=['lang', 'sl'], description="Set the language for TTS messages.\n\nCommon languages:\n`en` - English\n`zh-CN` - Chinese (Simplified)\n`hi` - Hindi\n`es` - Spanish\n`fr` - French\n`ar` - Arabic\n`bn` - Bengali\n`ru` - Russian\n`pt` - Portuguese\n`ja` - Japanese\n`ur` - Urdu\n`ko` - Korean\n`de` - German\n`id` - Indonesian\n\nFor more supported languages, please refer to [github](https://github.com/3022249729/RenoTTS?tab=readme-ov-file#languages). ")
+    async def _language(self, ctx, lang):
+        if lang not in languages.keys():
+            await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]['prefix']}lang` for a list of supported languages.")
+            return
+        self.settings[str(ctx.guild.id)]['language'] = lang
+        with open('serverSettings.json', 'w') as f:
+            json.dump(self.settings, f, indent=4)
+        await ctx.send(f"Language set to {languages[str(lang)]['name']}")
+        self.readSettings()
+
+    @commands.command(name='setPrefix', aliases=['sp'], description="Change custom bot prefix.")
+    async def _prefix(self, ctx, prefix):
+        self.ignoreTTS = True
+        self.settings[str(ctx.guild.id)]['prefix'] = prefix
+        with open('serverSettings.json', 'w') as f:
+            json.dump(self.settings, f, indent=4)
+        await ctx.send(f"Prefix changed to {prefix}")
+        self.readSettings()
+
     @commands.command(name='settings', description="Get the TTS settings for the server.")
     async def _settings(self, ctx):
         embed = discord.Embed(title="Settings")
@@ -172,7 +172,6 @@ class TTS(commands.Cog):
             return "None"
         else:
             return f"<#{self.settings[str(guild)]['channel']}>"
-
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
