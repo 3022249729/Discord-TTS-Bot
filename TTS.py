@@ -138,7 +138,7 @@ class TTS(commands.Cog):
         await ctx.send(f"TTS channel cleared.")
         self.readSettings()
 
-    @commands.command(name='language', aliases=['lang', 'sl'], description="Set the language for TTS messages.\n\nCommon languages:\n`en` - English\n`zh-CN` - Chinese (Simplified)\n`hi` - Hindi\n`es` - Spanish\n`fr` - French\n`ar` - Arabic\n`bn` - Bengali\n`ru` - Russian\n`pt` - Portuguese\n`ja` - Japanese\n`ur` - Urdu\n`ko` - Korean\n`de` - German\n`id` - Indonesian\n\nFor more supported languages, please refer to [github](https://github.com/3022249729/RenoTTS?tab=readme-ov-file#languages). ")
+    @commands.command(name='language', aliases=['lang', 'sl'], description="Set the language for TTS messages.\n\nCommon languages:\n`en` - English\n`zh-CN` - Chinese (Simplified)\n`hi` - Hindi\n`es` - Spanish\n`fr` - French\n`ar` - Arabic\n`bn` - Bengali\n`ru` - Russian\n`pt` - Portuguese\n`ja` - Japanese\n`ur` - Urdu\n`ko` - Korean\n`de` - German\n`id` - Indonesian\n\nFor more supported languages, please refer to [github](https://github.com/3022249729/RenoTTS?tab=readme-ov-file#supported-languages).")
     async def _language(self, ctx, lang):
         if lang not in languages.keys():
             await ctx.send(f"Invalid language {lang}, use `{self.settings[str(ctx.guild.id)]['prefix']}lang` for a list of supported languages.")
